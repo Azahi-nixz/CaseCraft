@@ -33,7 +33,6 @@ export default function SubtopicsEditor({ subtopics, setSubtopics }) {
     if (e.key === "Enter") addNew();
   }
 
-  // Drag-to-reorder
   function onDragStart(index) { dragItem.current = index; }
   function onDragEnter(index) { dragOver.current = index; }
   function onDragEnd() {

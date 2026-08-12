@@ -2,15 +2,6 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { regenerateSection } from "../utils/aiService";
 import { exportToPDF, exportToDOCX } from "../utils/exportUtils";
 
-/**
- * ResultPage — fixed issues:
- *  - wordCount is memoized (no recompute on every render)
- *  - Paragraph keys use content hash, not array index (stable DOM reuse)
- *  - Per-section regenerate with its own AbortController (no stale requests)
- *  - Abort cleanup on unmount
- *  - editedSections initialised from prop only once (via useState lazy init)
- *    and synced via useEffect when the parent passes new sections (regenerate)
- */
 export default function ResultPage({
   sections,
   topic,
@@ -24,37 +15,32 @@ export default function ResultPage({
 }) {
   const [editing, setEditing]               = useState(false);
   const [editedSections, setEditedSections] = useState(() => sections);
-  const [regenId, setRegenId]               = useState(null); // id of section being re-gen'd
+  const [regenId, setRegenId]               = useState(null);
   const abortRef = useRef(null);
 
-  // Sync when parent supplies fresh sections (after full regeneration)
   useEffect(() => {
     setEditedSections(sections);
     setEditing(false);
   }, [sections]);
 
-  // Cancel any in-flight per-section regen on unmount (memory / request leak fix)
   useEffect(() => {
     return () => { abortRef.current?.(); };
   }, []);
 
-  // ── Memoized word count — only recomputes when sections change ───────────
   const wordCount = useMemo(
     () => editedSections.reduce((acc, s) => acc + s.body.split(/\s+/).filter(Boolean).length, 0),
     [editedSections]
   );
 
-  // ── Section body update ───────────────────────────────────────────────────
   function updateBody(id, val) {
     setEditedSections((prev) =>
       prev.map((s) => (s.id === id ? { ...s, body: val } : s))
     );
   }
 
-  // ── Per-section regenerate ────────────────────────────────────────────────
   async function handleRegenSection(section) {
     if (!apiKey) { addToast("API key not found — go back and re-enter it.", "error"); return; }
-    abortRef.current?.(); // cancel any previous in-flight call
+    abortRef.current?.();
 
     setRegenId(section.id);
     const { promise, abort } = regenerateSection({
@@ -115,7 +101,6 @@ export default function ResultPage({
     a.href = url;
     a.download = filename;
     a.click();
-    // Revoke after a tick — avoids premature revocation on some browsers
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
@@ -129,7 +114,6 @@ export default function ResultPage({
 
   function downloadHtml() {
     const slug = topic.replace(/\s+/g, "-").toLowerCase().slice(0, 60);
-    // Sanitise section content for HTML (basic — no XSS risk as user-generated)
     const sectionsHtml = editedSections
       .map((s) => {
         const paras = s.body
@@ -163,10 +147,8 @@ export default function ResultPage({
     addToast("Downloaded as .html!", "success");
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="result-page">
-      {/* Toolbar */}
       <div className="result-toolbar">
         <div className="result-toolbar-left">
           <button className="btn btn-ghost" onClick={onBack}>← Back</button>
@@ -188,7 +170,6 @@ export default function ResultPage({
         </div>
       </div>
 
-      {/* Meta chips */}
       <div className="result-meta">
         <div className="meta-chip">📚 <span>{topic}</span></div>
         <div className="meta-chip">🌐 <span>{language}</span></div>
@@ -197,9 +178,7 @@ export default function ResultPage({
         <div className="meta-chip">📑 <span>{editedSections.length} sections</span></div>
       </div>
 
-      {/* Document */}
       <div className="result-doc glass">
-        {/* Title block */}
         <div className="doc-title-block">
           <div className="doc-label">Case Study</div>
           <h1 className="doc-main-title">{topic}</h1>
@@ -208,13 +187,11 @@ export default function ResultPage({
           </div>
         </div>
 
-        {/* Sections */}
         {editedSections.map((s) => (
           <div key={s.id} className="doc-section">
             <div className="doc-section-title">
               <span className="section-marker">✦</span>
               <span style={{ flex: 1 }}>{s.label}</span>
-              {/* Per-section regenerate button */}
               <button
                 className="icon-btn regen-btn"
                 title="Regenerate this section"

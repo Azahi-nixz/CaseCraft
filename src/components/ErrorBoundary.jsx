@@ -1,9 +1,5 @@
 import { Component } from "react";
 
-/**
- * Global error boundary — catches any unhandled React render errors
- * and shows a recoverable anime-style crash screen instead of a blank page.
- */
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -16,7 +12,6 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     this.setState({ info });
-    // Non-blocking console log — do not re-throw
     console.error("[CaseCraft ErrorBoundary]", error, info?.componentStack);
   }
 

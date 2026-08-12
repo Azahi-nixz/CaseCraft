@@ -4,7 +4,6 @@ import { getRandomAnimeFact } from "../constants/animeFacts";
 export default function LoadingOverlay({ status, progress, onCancel }) {
   const [currentFact, setCurrentFact] = useState(getRandomAnimeFact());
 
-  // Cycle through anime facts every 7 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentFact(getRandomAnimeFact());

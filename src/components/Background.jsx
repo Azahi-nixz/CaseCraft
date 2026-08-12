@@ -1,15 +1,5 @@
 import { useMemo, useEffect, useRef } from "react";
 
-/**
- * Background — fixed decorative layer.
- * Performance fixes:
- *  - Reduced star count from 80 → 50 (less GPU compositor work)
- *  - Particles reduced from 18 → 12
- *  - CSS animations declared in index.css, not a mounted <style> tag
- *  - All animation values computed once via useMemo (no re-render cost)
- *  - The blob container uses will-change: transform so it gets its own layer
- *    and doesn't dirty the main stacking context on each frame
- */
 export default function Background() {
   const blobRef = useRef(null);
 
@@ -37,7 +27,6 @@ export default function Background() {
     }));
   }, []);
 
-  // Pause all animations when tab is hidden (reduces background CPU/GPU cost)
   useEffect(() => {
     const handler = () => {
       const state = document.hidden ? "paused" : "running";
@@ -56,7 +45,6 @@ export default function Background() {
 
   return (
     <>
-      {/* Gradient glow blobs — each on its own compositor layer */}
       <div
         ref={blobRef}
         style={{
@@ -69,7 +57,6 @@ export default function Background() {
         <div className="bg-blob bg-blob-3" />
       </div>
 
-      {/* Stars */}
       <div className="star-field">
         {stars.map((s) => (
           <span
@@ -85,7 +72,6 @@ export default function Background() {
         ))}
       </div>
 
-      {/* Floating particles */}
       <div className="particles">
         {particles.map((p) => (
           <span

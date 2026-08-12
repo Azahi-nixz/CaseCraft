@@ -21,14 +21,12 @@ function saveSession(data) {
   try { sessionStorage.setItem(SS_KEY, JSON.stringify(data)); } catch (_) {}
 }
 
-// Returns model list for a given provider
 function modelsForProvider(prov) {
   if (prov === "openai")  return AI_MODELS.openai;
   if (prov === "ollama")  return AI_MODELS.ollama;
   return AI_MODELS.openrouter;
 }
 
-// Builds the effective apiKey for aiService
 function effectiveKey(prov, key) {
   if (prov === "ollama") return "ollama";
   return key.trim();
@@ -37,7 +35,6 @@ function effectiveKey(prov, key) {
 export default function App() {
   const { toasts, addToast, dismissToast } = useToast();
 
-  // ── Form state ─────────────────────────────────────────────────────────
   const [topic,    setTopic]    = useState("");
   const [pages,    setPages]    = useState(5);
   const [language, setLanguage] = useState("English");
@@ -50,7 +47,6 @@ export default function App() {
     DEFAULT_SUBTOPICS.map((s) => ({ ...s, enabled: true }))
   );
 
-  // ── App state ──────────────────────────────────────────────────────────
   const [loading,      setLoading]      = useState(false);
   const [loadStatus,   setLoadStatus]   = useState("");
   const [loadProgress, setLoadProgress] = useState(0);
@@ -60,7 +56,6 @@ export default function App() {
   const [noticeDismissed, setNoticeDismissed] = useState(false);
   const abortGenRef = useRef(null);
 
-  // ── Restore session ───────────────────────────────────────────────────
   useEffect(() => {
     const saved = loadSession();
     if (!saved) return;
@@ -76,14 +71,12 @@ export default function App() {
     saveSession({ topic, pages, language, subtopics, model, provider });
   }, [topic, pages, language, subtopics, model, provider]);
 
-  // ── Auto-select first recommended model when provider changes ─────────
   useEffect(() => {
     const models = modelsForProvider(provider);
     const rec = models.find(m => m.recommended) ?? models[0];
     if (rec) setModel(rec.id);
   }, [provider]);
 
-  // ── Ollama proxy status ───────────────────────────────────────────────
   const [ollamaStatus, setOllamaStatus] = useState("idle");
   const [ollamaModels, setOllamaModels] = useState([]);
 
@@ -109,7 +102,6 @@ export default function App() {
     return () => { cancelled = true; };
   }, [provider, ollamaUrl]);
 
-  // ── beforeunload ──────────────────────────────────────────────────────
   useEffect(() => {
     const hasData = topic.trim().length > 0 || result !== null;
     if (!hasData) return;
@@ -125,7 +117,6 @@ export default function App() {
     setLoadProgress(pct);
   }, []);
 
-  // ── Generate ──────────────────────────────────────────────────────────
   async function handleGenerate() {
     setError("");
     const active = subtopics.filter((s) => s.enabled !== false);
@@ -190,7 +181,6 @@ export default function App() {
 
   const availableModels = modelsForProvider(provider);
 
-  // ── Render ────────────────────────────────────────────────────────────
   return (
     <>
       <Background />
@@ -289,11 +279,22 @@ export default function App() {
                     <a href="mailto:azahi.xyz@gmail.com">azahi.xyz@gmail.com</a>
                   </span>
                 </div>
+                <div className="disclaimer-divider" />
+                <div className="disclaimer-item">
+                  <span className="d-icon">⭐</span>
+                  <span>I will try my best to update free tier AI on OpenRouter regularly for you.</span>
+                </div>
+                <div className="disclaimer-item">
+                  <span className="d-icon">🦙</span>
+                  <span>For Llama users: visit my{" "}
+                    <a href="https://github.com/Azahi-nixz" target="_blank" rel="noreferrer">GitHub</a>
+                    {" "}and download <code className="inline-code">START-PROXY.bat</code> for easier backend AI hosting (BETA).
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="main-grid">
-              {/* Config panel */}
               <div className="panel glass">
                 <div className="panel-header">
                   <span className="panel-icon">⚙️</span>
