@@ -2,7 +2,7 @@
 
 > *Craft your academic masterpiece in seconds, not sleepless nights.*
 
-An anime-styled AI-powered case study generator designed for students who want professional results **without the AI-detection penalties**. Write, export, and submit with confidence.
+An AI-powered case study generator designed for students who want professional results **without the AI-detection penalties**. Write, export, and submit with confidence.
 
 ---
 
@@ -131,7 +131,7 @@ For users who want complete control:
 ## 🛠 Tech Stack
 
 - **Frontend:** React 18 + Vite
-- **Styling:** Vanilla CSS with anime-inspired animations
+- **Styling:** Vanilla CSS
 - **State Management:** React Hooks (useState, useEffect, useRef, useMemo)
 - **Backend (Proxy):** Node.js + Express (for self-hosted Ollama)
 - **Export:** PDF-lib (PDFs), docx (Word docs), HTML generation
@@ -202,14 +202,14 @@ Your feedback helps make CaseCraft better for everyone.
 
 ## 📜 License
 
-This project is open-source and available under the **MIT License**.  
+This project is open-source and available under the **Creative Commons License**.  
 See the LICENSE file for details.
 
 ---
 
 ## 🙏 Acknowledgments
 
-- Built with ❤️ for students everywhere
+- Built with ❤️ for students everywhere like me!
 - Inspired by the need for honest, AI-powered academic tools
 - Thanks to the open-source community for libraries like React, Vite, and Ollama
 
