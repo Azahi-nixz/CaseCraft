@@ -51,6 +51,8 @@ function buildPrompt(topic, pages, language, subtopics, sectionSlice = null) {
   const sliceWords  = sectionSlice
     ? Math.round(wordTarget * (sectionSlice.length / subtopics.length))
     : wordTarget;
+  const minWords = Math.round(sliceWords * 0.85);
+  const maxWords = Math.round(sliceWords * 1.15);
 
   const langClause = language !== "English"
     ? `DO NOT write in English. Use ${language} exclusively.`
@@ -67,19 +69,22 @@ function buildPrompt(topic, pages, language, subtopics, sectionSlice = null) {
     `5. Transitions: Use natural ${language} connectors, not stiff academic ones.\n` +
     `6. Be specific: Real examples, concrete details, not generic filler.\n` +
     `7. No AI markers: No "It is important to note", "In today's world", etc.\n` +
-    `8. Final check: Verify EVERY word is in ${language} before responding.\n`;
+    `8. Word count: MUST be between ${minWords}-${maxWords} words. Expand or cut accordingly.\n` +
+    `9. Final check: Verify EVERY word is in ${language} before responding.\n`;
 
   const userMsg =
     `[OOC: Sarah, write these case study sections in ${language}. ${langClause}]\n\n` +
     `TOPIC: "${topic}"\n` +
     `LANGUAGE: ${language} — mandatory, no exceptions\n` +
-    `WORD TARGET: ~${sliceWords} words\n\n` +
+    `WORD COUNT: MUST deliver ${minWords}-${maxWords} words total. This is required.\n\n` +
     `Sections to write (in order):\n${sectionList}\n\n` +
     `FORMAT:\n` +
     `- Start each section with "## [title in ${language}]"\n` +
     `- Write flowing paragraphs — no bullet points unless listing objectives\n` +
-    `- Specific observations about "${topic}" only — no generic padding\n` +
-    `- Begin immediately with the first ## header, no preamble`;
+    `- Specific observations about "${topic}" only — use depth to reach word count\n` +
+    `- Include relevant details, examples, analysis — expand as needed to hit word count\n` +
+    `- Begin immediately with the first ## header, no preamble\n` +
+    `- IMPORTANT: If running short, add more detail to existing sections instead of filler`;
 
   return { systemMsg, userMsg };
 }
@@ -152,7 +157,7 @@ function buildRequestConfig({ apiKey, model, ollamaUrl, systemMsg, userMsg, page
       options: {
         temperature: 0.72,
         top_p:       0.85,
-        num_predict: Math.min(pages * 900, 8192),
+        num_predict: Math.min(pages * 1200, 16384),
       },
     });
     return { url, headers, body, provider };
@@ -177,7 +182,7 @@ function buildRequestConfig({ apiKey, model, ollamaUrl, systemMsg, userMsg, page
     top_p:             0.50,
     frequency_penalty: 0.25,
     presence_penalty:  0.15,
-    max_tokens: Math.min(pages * 900, 14000),
+    max_tokens: Math.min(pages * 1200, 16000),
   });
   return { url, headers, body, provider };
 }
