@@ -1,0 +1,167 @@
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --pink:        #f472b6;
+  --pink-light:  #fbb6d6;
+  --pink-dark:   #db2777;
+  --purple:      #a78bfa;
+  --purple-deep: #7c3aed;
+  --blue:        #60a5fa;
+  --teal:        #2dd4bf;
+  --yellow:      #fbbf24;
+  --green:       #34d399;
+  --bg:          #09090f;
+  --bg2:         #0f0f1a;
+  --bg3:         #161625;
+  --card:        #12121e;
+  --border:      rgba(167, 139, 250, 0.2);
+  --border-hi:   rgba(167, 139, 250, 0.45);
+  --text:        #ede9fe;
+  --text-dim:    #8b7fb8;
+  --text-faint:  #4c4570;
+  --radius:      14px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--purple-deep), var(--pink-dark));
+  border-radius: 99px;
+}
+
+/* ===== SHARED UTILITIES ===== */
+.glass {
+  background: rgba(18, 18, 30, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border-radius: 10px;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.btn:hover  { transform: translateY(-1px); opacity: 0.92; }
+.btn:active { transform: translateY(1px); opacity: 1; }
+
+.btn-primary {
+  background: var(--purple-deep);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.4);
+}
+.btn-primary:hover { box-shadow: 0 4px 20px rgba(124, 58, 237, 0.55); }
+
+.btn-secondary {
+  background: transparent;
+  border: 1.5px solid var(--border-hi);
+  color: var(--purple);
+}
+.btn-secondary:hover { background: rgba(167, 139, 250, 0.1); }
+
+.btn-ghost {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+.btn-danger {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+/* Tag pill */
+.tag {
+  display: inline-block;
+  padding: 3px 11px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid var(--border);
+  color: var(--purple);
+  letter-spacing: 0.02em;
+}
+
+/* Stars */
+.star-field {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+.star-field span {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle var(--d, 3s) ease-in-out infinite alternate;
+  opacity: 0;
+}
+@keyframes twinkle {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: var(--o, 0.6); transform: scale(1); }
+}
+
+/* Particles */
+.particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: float-up var(--dur, 9s) linear infinite;
+  opacity: 0;
+}
+@keyframes float-up {
+  0%   { opacity: 0; transform: translateY(0) scale(0.4); }
+  8%   { opacity: 0.5; }
+  92%  { opacity: 0.2; }
+  100% { opacity: 0; transform: translateY(-105vh) scale(1); }
+}
+
+/* BG blobs */
+.bg-blob { position: absolute; border-radius: 50%; will-change: transform; }
+.bg-blob-1 {
+  top: -15%; left: -8%;
+  width: 550px; height: 550px;
+  background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 65%);
+  animation: blob-a 16s ease-in-out infinite alternate;
+}
+.bg-blob-2 {
+  bottom: -10%; right: -4%;
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(244,114,182,0.07) 0%, transparent 65%);
+  animation: blob-b 20s ease-in-out infinite alternate-reverse;
+}
+.bg-blob-3 {
+  top: 45%; left: 38%;
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(45,212,191,0.05) 0%, transparent 65%);
+  animation: blob-c 25s ease-in-out infinite alternate;
+}
+@keyframes blob-a { from { transform: translate(0,0); } to { transform: translate(35px,28px); } }
+@keyframes blob-b { from { transform: translate(0,0); } to { transform: translate(-28px,18px); } }
+@keyframes blob-c { from { transform: translate(0,0); } to { transform: translate(22px,-30px); } }
