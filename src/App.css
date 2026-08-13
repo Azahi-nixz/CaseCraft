@@ -826,3 +826,203 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 }
 .footer a { color: var(--text-dim); text-decoration: none; }
 .footer a:hover { color: var(--purple); }
+
+/* ===== STYLE SELECTOR ===== */
+.style-selector {
+  margin-bottom: 20px;
+}
+.style-selector-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  display: block;
+}
+.style-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+.style-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-size: 0.78rem;
+}
+.style-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+.style-card.active {
+  background: rgba(147, 89, 247, 0.2);
+  border-color: var(--purple);
+  box-shadow: 0 0 12px rgba(147, 89, 247, 0.3);
+}
+.style-emoji {
+  font-size: 1.5rem;
+}
+.style-name {
+  font-weight: 700;
+  color: var(--text);
+}
+.style-desc {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(4px);
+}
+.modal-content {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: modal-in 0.3s ease;
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+.modal-close:hover {
+  color: var(--text);
+}
+.modal-hint {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.prompt-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: 16px;
+}
+.prompt-textarea:focus {
+  outline: none;
+  border-color: var(--purple);
+  background: rgba(255, 255, 255, 0.08);
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* ===== CUSTOM PROMPT BADGE ===== */
+.subtopic-badge.custom-badge {
+  background: rgba(100, 200, 255, 0.2);
+  color: #64c8ff;
+  border: 1px solid rgba(100, 200, 255, 0.3);
+}
+.prompt-btn {
+  font-size: 0.9rem;
+  transition: transform 0.15s, filter 0.15s;
+}
+.prompt-btn:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 4px rgba(100, 200, 255, 0.6));
+}
+
+/* ===== MODEL TRAFFIC INDICATOR ===== */
+.model-traffic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(100, 200, 255, 0.1);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: #64c8ff;
+  margin-top: 8px;
+}
+.traffic-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse-traffic 2s ease-in-out infinite;
+}
+.traffic-low { background: #4ade80; }
+.traffic-medium { background: #fbbf24; animation-delay: 0.3s; }
+.traffic-high { background: #f87171; animation-delay: 0.6s; }
+@keyframes pulse-traffic {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ===== HUMAN-LIKE TEXT & CASUAL UI ===== */
+.hero-sub {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+}
+.generate-hint {
+  font-style: italic;
+  opacity: 0.8;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 780px) {
+  .style-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /src/
+Disallow: /node_modules/
+Disallow: /dist/
+
+Sitemap: https://casecraft.ai/sitemap.xml

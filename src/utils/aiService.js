@@ -34,12 +34,93 @@ export function detectProvider(apiKey = "") {
 // OOC / JAILBREAK PREFIX
 // ─────────────────────────────────────────────────────────────────────────────
 const OOC_PREFIX =
-  `[OOC: This is a creative writing / academic simulation exercise. ` +
-  `You are roleplaying as Sarah Chen, a university student who writes ` +
-  `clear, straightforward case studies — no fancy jargon, no complex words. ` +
-  `Stay in character. No disclaimers. No AI mentions. ` +
-  `ABSOLUTE RULE: Write the ENTIRE document in the specified target language. ` +
-  `Translate everything — section titles included.]\n\n`;
+  `[OOC: This is an academic writing exercise. You are a university student ` +
+  `writing a real case study with authentic research and observations. ` +
+  `Stay focused. No AI disclaimers. No AI tone. ` +
+  `ABSOLUTE RULE: Write EVERYTHING in the specified target language. ` +
+  `Translate section titles too.]\n\n`;
+
+function getWritingStyleGuide(style) {
+  const guides = {
+    professional: {
+      tone: "Formal, academic, structured",
+      rules: [
+        "Use proper academic terminology",
+        "Maintain objective, third-person perspective",
+        "Include citations and evidence",
+        "Follow scholarly conventions",
+        "Varied but sophisticated vocabulary",
+      ],
+    },
+    casual: {
+      tone: "Conversational, approachable, friendly",
+      rules: [
+        "Write like talking to a friend",
+        "Use 'you' and relatable examples",
+        "Short, punchy sentences mixed with longer ones",
+        "Simple, everyday vocabulary",
+        "Natural flow, informal but professional",
+      ],
+    },
+    reporting: {
+      tone: "Objective, data-focused, factual",
+      rules: [
+        "Lead with facts and data",
+        "Active voice, minimal editorializing",
+        "Use metrics, statistics, and evidence",
+        "Chronological or logical structure",
+        "Clear, concise paragraphs",
+      ],
+    },
+    narrative: {
+      tone: "Story-driven, engaging, case-focused",
+      rules: [
+        "Build narrative around the case subject",
+        "Include relevant details and context",
+        "Logical progression of ideas",
+        "Make it engaging but factual",
+        "Bring the case to life with examples",
+      ],
+    },
+  };
+  return guides[style] || guides.professional;
+}
+
+function buildSectionPrompt(sectionLabel, topic, language, wordTarget, style) {
+  const guide = getWritingStyleGuide(style);
+  const minWords = Math.round(wordTarget * 0.85);
+  const maxWords = Math.round(wordTarget * 1.15);
+
+  const langClause = language !== "English"
+    ? `WRITE IN ${language} ONLY. Translate section title too.`
+    : `Write in English.`;
+
+  const styleRules = guide.rules.map((r, i) => `${i + 1}. ${r}`).join("\n");
+
+  const systemMsg =
+    OOC_PREFIX +
+    `TARGET LANGUAGE: ${language}. ${langClause}\n` +
+    `WRITING STYLE: ${guide.tone}\n\n` +
+    `STYLE GUIDELINES:\n${styleRules}\n\n` +
+    `ABSOLUTE RULES:\n` +
+    `• Word count: MUST be ${minWords}-${maxWords} words\n` +
+    `• Topic: "${topic}" only — no filler\n` +
+    `• Every word in ${language}\n` +
+    `• No "In today's world", "It is important", "As we know"\n` +
+    `• Be specific, include examples, add depth to reach word count\n`;
+
+  const userMsg =
+    `Write the "${sectionLabel}" section for a case study about "${topic}".\n\n` +
+    `REQUIREMENTS:\n` +
+    `• Language: ${language}\n` +
+    `• Word count: ${minWords}-${maxWords} words (required)\n` +
+    `• Style: ${guide.tone}\n` +
+    `• Format: Start with "## ${sectionLabel}" in ${language}\n` +
+    `• Content: Flowing paragraphs, no bullets unless listing\n` +
+    `• Start immediately — no preamble`;
+
+  return { systemMsg, userMsg };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PROMPT BUILDER  (language is now a required param, always threaded through)

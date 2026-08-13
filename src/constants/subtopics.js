@@ -1,4 +1,3 @@
-// Default mandatory subtopics for a case study
 export const DEFAULT_SUBTOPICS = [
   { id: "intro",        label: "Introduction",                   required: true  },
   { id: "synopsis",     label: "Synopsis / Executive Summary",   required: true  },
@@ -13,6 +12,13 @@ export const DEFAULT_SUBTOPICS = [
   { id: "conclusion",   label: "Conclusion",                     required: true  },
   { id: "recommend",    label: "Recommendations",                required: false },
   { id: "references",   label: "References / Bibliography",      required: true  },
+];
+
+export const WRITING_STYLES = [
+  { id: "professional", label: "📊 Professional", desc: "Formal academic tone, structured" },
+  { id: "casual",       label: "💬 Casual", desc: "Relaxed, conversational approach" },
+  { id: "reporting",    label: "📋 Reporting", desc: "Data-focused, objective findings" },
+  { id: "narrative",    label: "📖 Narrative", desc: "Story-driven case analysis" },
 ];
 
 export const LANGUAGES = [

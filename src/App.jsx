@@ -3,12 +3,13 @@ import "./App.css";
 
 import Background       from "./components/Background";
 import SubtopicsEditor  from "./components/SubtopicsEditor";
+import StyleSelector    from "./components/StyleSelector";
 import LoadingOverlay   from "./components/LoadingOverlay";
 import ResultPage       from "./components/ResultPage";
 import Toast            from "./components/Toast";
 import { useToast }     from "./hooks/useToast";
 import { DEFAULT_SUBTOPICS, LANGUAGES } from "./constants/subtopics";
-import { AI_MODELS, getModelInfo } from "./constants/models";
+import { AI_MODELS } from "./constants/models";
 import { generateCaseStudy, DEFAULT_OLLAMA_URL } from "./utils/aiService";
 
 const SS_KEY = "casecraft_state";
@@ -35,24 +36,25 @@ function effectiveKey(prov, key) {
 export default function App() {
   const { toasts, addToast, dismissToast } = useToast();
 
-  const [topic,    setTopic]    = useState("");
-  const [pages,    setPages]    = useState(5);
-  const [language, setLanguage] = useState("English");
-  const [provider, setProvider] = useState("openrouter");
-  const [apiKey,   setApiKey]   = useState("");
-  const [model,    setModel]    = useState("");
-  const [ollamaUrl, setOllamaUrl] = useState(DEFAULT_OLLAMA_URL);
-  const [showKey,  setShowKey]  = useState(false);
-  const [subtopics, setSubtopics] = useState(() =>
+  const [topic,         setTopic]         = useState("");
+  const [pages,         setPages]         = useState(5);
+  const [language,      setLanguage]      = useState("English");
+  const [writingStyle,  setWritingStyle]  = useState("professional");
+  const [provider,      setProvider]      = useState("openrouter");
+  const [apiKey,        setApiKey]        = useState("");
+  const [model,         setModel]         = useState("");
+  const [ollamaUrl,     setOllamaUrl]     = useState(DEFAULT_OLLAMA_URL);
+  const [showKey,       setShowKey]       = useState(false);
+  const [subtopics,     setSubtopics]     = useState(() =>
     DEFAULT_SUBTOPICS.map((s) => ({ ...s, enabled: true }))
   );
 
-  const [loading,      setLoading]      = useState(false);
-  const [loadStatus,   setLoadStatus]   = useState("");
-  const [loadProgress, setLoadProgress] = useState(0);
-  const [result,       setResult]       = useState(null);
-  const [resultMeta,   setResultMeta]   = useState(null);
-  const [error,        setError]        = useState("");
+  const [loading,       setLoading]       = useState(false);
+  const [loadStatus,    setLoadStatus]    = useState("");
+  const [loadProgress,  setLoadProgress]  = useState(0);
+  const [result,        setResult]        = useState(null);
+  const [resultMeta,    setResultMeta]    = useState(null);
+  const [error,         setError]         = useState("");
   const [noticeDismissed, setNoticeDismissed] = useState(false);
   const abortGenRef = useRef(null);
 
@@ -68,8 +70,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    saveSession({ topic, pages, language, subtopics, model, provider });
-  }, [topic, pages, language, subtopics, model, provider]);
+    saveSession({ topic, pages, language, subtopics, model, provider, writingStyle });
+  }, [topic, pages, language, subtopics, model, provider, writingStyle]);
 
   useEffect(() => {
     const models = modelsForProvider(provider);
@@ -135,6 +137,7 @@ export default function App() {
       topic: topic.trim(),
       pages,
       language,
+      writingStyle,
       subtopics: active,
       model,
       ollamaUrl,
@@ -328,7 +331,7 @@ export default function App() {
                   </select>
                 </div>
 
-                {/* ── PROVIDER SELECTION ── */}
+                <StyleSelector selectedStyle={writingStyle} onStyleChange={setWritingStyle} />
                 <div className="field-group">
                   <label className="field-label">🔑 AI Provider</label>
 

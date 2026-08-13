@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
+import CustomPromptModal from "./CustomPromptModal";
 
 export default function SubtopicsEditor({ subtopics, setSubtopics }) {
   const [newLabel, setNewLabel] = useState("");
+  const [editingPromptId, setEditingPromptId] = useState(null);
   const dragItem = useRef(null);
   const dragOver = useRef(null);
 
@@ -44,54 +46,74 @@ export default function SubtopicsEditor({ subtopics, setSubtopics }) {
     setSubtopics(list);
   }
 
+  function saveCustomPrompt(sectionId, prompt) {
+    setSubtopics((prev) =>
+      prev.map((s) => (s.id === sectionId ? { ...s, customPrompt: prompt } : s))
+    );
+    setEditingPromptId(null);
+  }
+
   const enabledCount = subtopics.filter((s) => s.enabled !== false).length;
 
   return (
-    <div className="subtopics-list">
-      {subtopics.map((s, index) => {
-        const isEnabled = s.enabled !== false;
-        return (
-          <div
-            key={s.id}
-            className={`subtopic-item${isEnabled ? "" : " disabled"}`}
-            draggable
-            onDragStart={() => onDragStart(index)}
-            onDragEnter={() => onDragEnter(index)}
-            onDragEnd={onDragEnd}
-            onDragOver={(e) => e.preventDefault()}
-            style={{ opacity: isEnabled ? 1 : 0.45 }}
-          >
-            <span className="drag-handle" title="Drag to reorder">⠿</span>
-            <input
-              type="checkbox"
-              className="subtopic-check"
-              checked={isEnabled}
-              onChange={() => toggleCheck(s.id)}
-              title={s.required ? "Required section" : "Toggle section"}
-            />
-            {s.custom ? (
+    <>
+      <div className="subtopics-list">
+        {subtopics.map((s, index) => {
+          const isEnabled = s.enabled !== false;
+          return (
+            <div
+              key={s.id}
+              className={`subtopic-item${isEnabled ? "" : " disabled"}`}
+              draggable
+              onDragStart={() => onDragStart(index)}
+              onDragEnter={() => onDragEnter(index)}
+              onDragEnd={onDragEnd}
+              onDragOver={(e) => e.preventDefault()}
+              style={{ opacity: isEnabled ? 1 : 0.45 }}
+            >
+              <span className="drag-handle" title="Drag to reorder">⠿</span>
               <input
-                className="subtopic-name custom-name"
-                value={s.label}
-                onChange={(e) => updateLabel(s.id, e.target.value)}
-                placeholder="Section name…"
+                type="checkbox"
+                className="subtopic-check"
+                checked={isEnabled}
+                onChange={() => toggleCheck(s.id)}
+                title={s.required ? "Required section" : "Toggle section"}
               />
-            ) : (
-              <span className="subtopic-name">{s.label}</span>
-            )}
-            {s.required && <span className="subtopic-badge">required</span>}
-            {s.custom && (
+              {s.custom ? (
+                <input
+                  className="subtopic-name custom-name"
+                  value={s.label}
+                  onChange={(e) => updateLabel(s.id, e.target.value)}
+                  placeholder="Section name…"
+                />
+              ) : (
+                <span className="subtopic-name">{s.label}</span>
+              )}
+              {s.required && <span className="subtopic-badge">required</span>}
+              {s.customPrompt && <span className="subtopic-badge custom-badge">custom prompt</span>}
+              
               <div className="subtopic-actions">
                 <button
-                  className="icon-btn del"
-                  onClick={() => deleteItem(s.id)}
-                  title="Remove"
-                >🗑</button>
+                  className="icon-btn prompt-btn"
+                  onClick={() => setEditingPromptId(s.id)}
+                  title="Add custom prompt"
+                >
+                  💡
+                </button>
+                {s.custom && (
+                  <button
+                    className="icon-btn del"
+                    onClick={() => deleteItem(s.id)}
+                    title="Remove"
+                  >
+                    🗑
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
+      </div>
 
       <div className="add-topic-row" style={{ marginTop: 4 }}>
         <input
@@ -108,8 +130,16 @@ export default function SubtopicsEditor({ subtopics, setSubtopics }) {
       </div>
 
       <div style={{ fontSize: "0.78rem", color: "var(--text-dim)", marginTop: 4 }}>
-        {enabledCount} section{enabledCount !== 1 ? "s" : ""} enabled · drag to reorder
+        {enabledCount} section{enabledCount !== 1 ? "s" : ""} enabled · drag to reorder · 💡 for custom prompts
       </div>
-    </div>
+
+      {editingPromptId && (
+        <CustomPromptModal
+          section={subtopics.find((s) => s.id === editingPromptId)}
+          onSave={(prompt) => saveCustomPrompt(editingPromptId, prompt)}
+          onCancel={() => setEditingPromptId(null)}
+        />
+      )}
+    </>
   );
 }
