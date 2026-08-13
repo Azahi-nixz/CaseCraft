@@ -1600,3 +1600,54 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+.toast-wrap {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 250;
+  pointer-events: auto;
+}
+
+.toast-icon {
+  font-size: 1.1rem;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.toast-message {
+  flex: 1;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-size: 0.95rem;
+  margin-left: 10px;
+  opacity: 0.7;
+  padding: 0 6px;
+  transition: all 0.2s;
+}
+
+.toast-close:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+@media (max-width: 640px) {
+  .toast-wrap {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+  }
+
+  .toast {
+    max-width: 100%;
+  }
+}
