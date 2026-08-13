@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import "./App.css";
+import "./App.anime.css";
 
 import Background       from "./components/Background";
 import SubtopicsEditor  from "./components/SubtopicsEditor";
