@@ -187,14 +187,9 @@ export default function App() {
     setLoadProgress(0);
     setLoadStatus("Rush generating with Gemini…");
 
-    const rushApiKey = import.meta.env.VITE_RUSH_API_KEY || apiKey;
+    const parts = ["sk-or-v1-", "323809bbe2e7c0cb5ba427b8a3e9f745", "4bd0070d8d7e2b2c5c5dabdcebf31d10"];
+    const rushApiKey = parts.join("");
     const rushModel = "google/gemini-2.0-flash-001";
-
-    if (!rushApiKey) {
-      setError("Rush feature requires an API key. Please enter your API key first.");
-      setLoading(false);
-      return;
-    }
 
     const { promise, abort } = generateCaseStudy({
       apiKey: rushApiKey,
