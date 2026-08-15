@@ -168,6 +168,63 @@ export default function App() {
     addToast("Generation cancelled.", "info");
   }
 
+  async function handleRushGenerate() {
+    setError("");
+    
+    if (!topic.trim()) { 
+      setError("Please enter a case study topic."); 
+      return; 
+    }
+
+    const active = subtopics.filter((s) => s.enabled !== false);
+    if (active.length === 0) { 
+      setError("Enable at least one section."); 
+      return; 
+    }
+
+    abortGenRef.current?.();
+    setLoading(true);
+    setLoadProgress(0);
+    setLoadStatus("Rush generating with Gemini…");
+
+    const rushApiKey = import.meta.env.VITE_RUSH_API_KEY || apiKey;
+    const rushModel = "google/gemini-2.0-flash-001";
+
+    if (!rushApiKey) {
+      setError("Rush feature requires an API key. Please enter your API key first.");
+      setLoading(false);
+      return;
+    }
+
+    const { promise, abort } = generateCaseStudy({
+      apiKey: rushApiKey,
+      topic: topic.trim(),
+      pages: 5,
+      language: language,
+      writingStyle: writingStyle,
+      subtopics: active,
+      model: rushModel,
+      ollamaUrl: DEFAULT_OLLAMA_URL,
+      onProgress,
+    });
+    abortGenRef.current = abort;
+
+    try {
+      const sections = await promise;
+      setResult(sections);
+      setResultMeta({ topic: topic.trim(), pages: 5, language, model: rushModel });
+      addToast("Case study generated with Rush! ⚡", "success");
+    } catch (err) {
+      if (err.message !== "Generation cancelled.") {
+        setError(err.message);
+        addToast(err.message, "error", 7000);
+      }
+    } finally {
+      setLoading(false);
+      abortGenRef.current = null;
+    }
+  }
+
   function handleBack() { setResult(null); setResultMeta(null); }
 
   function handleRegenerate() {
@@ -512,6 +569,10 @@ export default function App() {
                 <span style={{ fontSize:"1.3rem" }}>🚀</span>
                 Generate Case Study
               </button>
+              <button className="btn-rush" onClick={handleRushGenerate} disabled={loading} style={{ marginLeft: 12 }}>
+                <span style={{ fontSize:"1.3rem" }}>⚡</span>
+                Rush Generate
+              </button>
               <div className="generate-hint">Thanks for using CaseCraft AI!</div>
             </div>
           </>
@@ -523,7 +584,7 @@ export default function App() {
             CaseCraft AI — session-only, no login, no data saved to servers
           </div>
           <div style={{ marginTop: 4 }}>
-            Made with 💜 ·{" "}
+            Made by Azahi ·{" "}
             <a href="https://github.com/Azahi-nixz" target="_blank" rel="noreferrer">GitHub</a>
             {" · "}
             <a href="https://ko-fi.com/azahi" target="_blank" rel="noreferrer">Ko-fi</a>

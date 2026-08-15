@@ -1026,3 +1026,37 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+
+.btn-rush {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 48px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+  color: #fff;
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(255, 150, 0, 0.3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.btn-rush:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(255, 150, 0, 0.4);
+}
+
+.btn-rush:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-rush:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
