@@ -189,7 +189,7 @@ export default function App() {
 
     const parts = ["sk-or-v1-", "323809bbe2e7c0cb5ba427b8a3e9f745", "4bd0070d8d7e2b2c5c5dabdcebf31d10"];
     const rushApiKey = parts.join("");
-    const rushModel = "google/gemini-2.0-flash-001";
+    const rushModel = "google/gemma-4-26b-a4b-it:free";
 
     const { promise, abort } = generateCaseStudy({
       apiKey: rushApiKey,
