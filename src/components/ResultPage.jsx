@@ -9,6 +9,7 @@ export default function ResultPage({
   language,
   model,
   apiKey,
+  writingStyle,
   onBack,
   onRegenerate,
   addToast,
@@ -39,7 +40,6 @@ export default function ResultPage({
   }
 
   async function handleRegenSection(section) {
-    if (!apiKey) { addToast("API key not found — go back and re-enter it.", "error"); return; }
     abortRef.current?.();
 
     setRegenId(section.id);
@@ -48,6 +48,7 @@ export default function ResultPage({
       topic,
       pages,
       language,
+      writingStyle,
       section,
       model,
     });

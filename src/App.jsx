@@ -288,6 +288,7 @@ export default function App() {
             language={resultMeta.language}
             model={resultMeta.model}
             apiKey={effectiveKey(provider, apiKey)}
+            writingStyle={writingStyle}
             onBack={handleBack}
             onRegenerate={handleRegenerate}
             addToast={addToast}
