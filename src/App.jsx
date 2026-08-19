@@ -568,6 +568,10 @@ export default function App() {
               <button className="btn-rush" onClick={handleRushGenerate} disabled={loading} style={{ marginLeft: 12 }}>
                 <span style={{ fontSize:"1.3rem" }}>⚡</span>
                 Rush Generate
+                <div className="rush-tooltip">
+                  ⚡ Quick generation with free AI model!<br />
+                  No API key needed - generates 5 pages instantly ✨
+                </div>
               </button>
               <div className="generate-hint">Thanks for using CaseCraft AI!</div>
             </div>

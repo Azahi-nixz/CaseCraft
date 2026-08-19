@@ -104,8 +104,8 @@ function buildSectionPrompt(section, topic, language, wordTarget, style = "profe
   const promptTemplate = SECTION_PROMPTS[sectionType];
   const styleGuide = STYLE_GUIDES[style] || STYLE_GUIDES.professional;
   
-  const minWords = Math.round(wordTarget * 0.85);
-  const maxWords = Math.round(wordTarget * 1.15);
+  const minWords = wordTarget;
+  const targetWords = Math.round(wordTarget * 1.2);
   
   const langInstruction = language !== "English" 
     ? `WRITE ENTIRELY IN ${language}. Every word must be ${language}.`
@@ -115,54 +115,26 @@ function buildSectionPrompt(section, topic, language, wordTarget, style = "profe
     `[Academic writing exercise. No AI disclaimers or markers.]\n` +
     `${promptTemplate.system(topic, language, styleGuide)}\n` +
     `${langInstruction}\n` +
-    `Word count: ${minWords}-${maxWords} words required.\n` +
+    `CRITICAL: Write AT LEAST ${minWords} words. Target ${targetWords} words.\n` +
     `Avoid: "It is important", "In today's world", "As we know".\n` +
-    `Use specific examples and concrete details about ${topic}.`;
+    `Use specific examples, data, and concrete details about ${topic}.\n` +
+    `If approaching word limit, expand with deeper analysis and additional examples.`;
   
   const userMsg =
     `Write "${section.label}" section about "${topic}".\n` +
     `Language: ${language}\n` +
-    `Word count: ${minWords}-${maxWords} words (required)\n` +
+    `MINIMUM WORD COUNT: ${minWords} words (go beyond if needed for completeness)\n` +
+    `Target: ${targetWords} words\n` +
     `Style: ${styleGuide}\n` +
-    `${promptTemplate.user(wordTarget)}\n` +
-    `Format: Start with "## ${section.label}" then write flowing paragraphs.\n` +
-    `Begin immediately, no preamble.`;
-  
-  return { systemMsg, userMsg };
-}
-
-function buildBatchPrompt(topic, pages, language, subtopics, style = "professional") {
-  const wordTarget = pages * 275;
-  const sectionList = subtopics.map((s, i) => `${i + 1}. ${s.label}`).join("\n");
-  const minWords = Math.round(wordTarget * 0.85);
-  const maxWords = Math.round(wordTarget * 1.15);
-  const styleGuide = STYLE_GUIDES[style] || STYLE_GUIDES.professional;
-  
-  const langInstruction = language !== "English"
-    ? `WRITE ENTIRELY IN ${language}. Translate section titles. No English words.`
-    : `Write in English.`;
-  
-  const systemMsg =
-    `[Academic case study writer. No AI disclaimers.]\n` +
-    `TARGET LANGUAGE: ${language}. ${langInstruction}\n` +
-    `STYLE: ${styleGuide}\n` +
-    `RULES:\n` +
-    `- Every word in ${language}\n` +
-    `- Mix short (5-10 words) and longer (15-25 words) sentences\n` +
-    `- Vary paragraph length (2-5 sentences)\n` +
-    `- Be specific to "${topic}" - use real examples\n` +
-    `- No "It is important", "In today's world", "As we know"\n` +
-    `- Word count: ${minWords}-${maxWords} total (required)\n` +
-    `- Expand with detail, not filler`;
-  
-  const userMsg =
-    `Write case study about "${topic}" in ${language}.\n` +
-    `Word count: ${minWords}-${maxWords} (required)\n` +
-    `Style: ${styleGuide}\n\n` +
-    `Sections:\n${sectionList}\n\n` +
-    `Format: Start each with "## [title in ${language}]"\n` +
-    `Write flowing paragraphs. No bullets unless listing.\n` +
-    `Begin immediately with first section.`;
+    `${promptTemplate.user(targetWords)}\n\n` +
+    `REQUIREMENTS:\n` +
+    `- Start with "## ${section.label}"\n` +
+    `- Write comprehensive, detailed paragraphs\n` +
+    `- Include multiple examples and thorough analysis\n` +
+    `- Expand ideas fully - don't rush to conclusion\n` +
+    `- Add subsections if helpful for organization\n` +
+    `- Write until the section feels complete and thorough\n` +
+    `Begin immediately.`;
   
   return { systemMsg, userMsg };
 }
@@ -347,35 +319,58 @@ export function generateCaseStudy({
   const { signal } = controller;
   
   const promise = (async () => {
-    onProgress?.("Connecting to AI…", 10);
+    onProgress?.("Initializing generation…", 5);
     
-    const useChunks = pages > 8 && subtopics.length > 6;
-    const mid = Math.ceil(subtopics.length / 2);
-    const batches = useChunks ? [subtopics.slice(0, mid), subtopics.slice(mid)] : [subtopics];
+    const totalWords = pages * 275;
+    const wordsPerSection = Math.floor(totalWords / subtopics.length);
+    const completedSections = [];
     
-    let allSections = [];
-    
-    for (let i = 0; i < batches.length; i++) {
-      const batch = batches[i];
-      const pctStart = 20 + i * 35;
+    for (let i = 0; i < subtopics.length; i++) {
+      const section = subtopics[i];
+      const progress = 10 + Math.floor((i / subtopics.length) * 85);
       
-      onProgress?.(
-        batches.length > 1 ? `Writing part ${i + 1} of ${batches.length}…` : "Generating content…",
-        pctStart
+      onProgress?.(`Writing ${section.label} (${i + 1}/${subtopics.length})…`, progress);
+      
+      const contextInfo = completedSections.length > 0
+        ? `\n\nPREVIOUSLY COMPLETED SECTIONS:\n${completedSections.map(s => 
+            `## ${s.label}\n${s.body.substring(0, 200)}...`
+          ).join('\n\n')}\n\nBuild upon this context and avoid repetition.`
+        : '';
+      
+      const { systemMsg, userMsg } = buildSectionPrompt(
+        section,
+        topic,
+        language,
+        wordsPerSection,
+        writingStyle
       );
       
-      const { systemMsg, userMsg } = buildBatchPrompt(topic, pages, language, batch, writingStyle);
-      const raw = await callModel({ apiKey, model, ollamaUrl, systemMsg, userMsg, pages, signal });
+      const enhancedUserMsg = userMsg + contextInfo;
       
-      if (!raw.trim()) throw new Error("Empty response from model.");
+      const raw = await callModel({
+        apiKey,
+        model,
+        ollamaUrl,
+        systemMsg,
+        userMsg: enhancedUserMsg,
+        pages: 1,
+        signal
+      });
       
-      onProgress?.("Parsing sections…", pctStart + 25);
-      const parsed = parseSections(raw, batch);
-      allSections = [...allSections, ...parsed];
+      if (!raw.trim()) throw new Error(`Empty response for ${section.label}.`);
+      
+      const parsed = parseSections(raw, [section]);
+      const sectionData = parsed[0] || {
+        id: section.id,
+        label: section.label,
+        body: raw.replace(/^#+\s*.*\n/, '').trim()
+      };
+      
+      completedSections.push(sectionData);
     }
     
     onProgress?.("Done! ✨", 100);
-    return allSections;
+    return completedSections;
   })();
   
   return { promise, abort: () => controller.abort() };
